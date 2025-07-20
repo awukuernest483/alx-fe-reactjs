@@ -7,7 +7,7 @@ import Header from './components/Header';
 import './App.css'
 import UserProfile from './components/UserProfile';
 import Counter from './components/Counter';
-import UserContext from './UserContext';
+import UserContext from './components/UserContext';
 
 function App() {
 

@@ -18,7 +18,7 @@ function App() {
     <div className="">
       <Header />
       <UserContext.Provider value={{ userData, setUser: setUserData }}>
-        <UserProfile userData={userData} />
+        <UserProfile />
       </UserContext.Provider>
       <WelcomeMessage />
       <MainContent />

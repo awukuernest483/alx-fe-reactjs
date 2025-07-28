@@ -7,11 +7,13 @@ import RecipeDetails from './components/RecipeDetails';
 import FavoritesList from './components/FavoritesList';
 import RecommendationsList from './components/RecommendationsList';
 
+
 function App() {
 
   return (
     <Router>
       <div>
+        <SearchBar/>
         <RecipeList/>
         <AddRecipeForm />
         <FavoritesList />
@@ -26,6 +28,7 @@ function App() {
 
 // Wrapper to extract recipeId from URL and pass to RecipeDetails
 import { useParams } from 'react-router-dom';
+import {SearchBar} from './components/Searchbar';
 function RecipeDetailsWrapper() {
   const { recipeId } = useParams();
   return <RecipeDetails recipeId={recipeId} />;

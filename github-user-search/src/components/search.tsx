@@ -1,55 +1,64 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import fetchUserData from "../services/githubService";
 
 const Search = () => {
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetchUserData((username) => `https://api.github.com/users/${username}`)
-      .then((userData) => {
-        setUsers(userData);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching users:", error);
-        setLoading(false);
-      });
-  }, []);
+  const handleSearch = async (e) => {
+    const username = e.target.value.trim();
+
+    // Clear results if input is empty
+    if (!username) {
+      setUsers([]);
+      setError("");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const userData = await fetchUserData(username);
+      setUsers([userData]);
+    } catch (err) {
+      console.error("Error fetching user:", err.message);
+      setUsers([]);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div>
       <input
         type="text"
         placeholder="Search for a GitHub user..."
-        className="search-input"
-        aria-label="Search GitHub users"
-        aria-describedby="search-help"
-        autoComplete="off"
-        autoFocus
-        spellCheck="false"
-        role="searchbox"
-        id="github-user-search"
-        name="github-user-search"
-        data-testid="github-user-search"
+        onChange={handleSearch}
         style={{ width: "100%", padding: "10px", fontSize: "16px" }}
-        onChange={(e) => {
-          fetchUserData(e.target.value ?? "a");
-        }}
       />
 
       <ul id="search-results">
-        {loading ? (
-          <li>Loading...</li>
-        ) : users.length > 0 ? (
+        {loading && <li>Loading...</li>}
+        {error && <li style={{ color: "red" }}>{error}</li>}
+        {!loading &&
+          !error &&
+          users.length > 0 &&
           users.map((user) => (
-            <li key={user} className="search-result-item">
-              {user}
+            <li key={user.id}>
+              <img
+                src={user.avatar_url}
+                alt={user.login}
+                width={32}
+                style={{ borderRadius: "50%", marginRight: "10px" }}
+              />
+              <a href={user.html_url} target="_blank" rel="noopener noreferrer">
+                {user.login}
+              </a>
             </li>
-          ))
-        ) : (
-          <li>No results found.</li>
-        )}
+          ))}
       </ul>
     </div>
   );

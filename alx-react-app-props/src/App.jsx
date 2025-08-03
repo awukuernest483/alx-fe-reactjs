@@ -14,7 +14,6 @@ function App() {
   const [userData, setUserData] = React.useState({ name: "Ernest", age: 25, bio: "Loves money" });
 
   return (
-    console.log(userData),
     <div className="">
       <Header />
       <UserContext.Provider value={{ userData, setUser: setUserData }}>

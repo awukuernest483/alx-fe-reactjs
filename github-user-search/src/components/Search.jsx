@@ -2,15 +2,15 @@ import React, { useState } from "react";
 import fetchUserData from "../services/githubService";
 
 const Search = () => {
+  const [username, setUsername] = useState(""); // <-- Input state
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSearch = async (e) => {
-    const username = e.target.value.trim();
+  const handleSearch = async () => {
+    const trimmedUsername = username.trim();
 
-    // Clear results if input is empty
-    if (!username) {
+    if (!trimmedUsername) {
       setUsers([]);
       setError("");
       return;
@@ -20,10 +20,10 @@ const Search = () => {
     setError("");
 
     try {
-      const userData = await fetchUserData(username);
+      const userData = await fetchUserData(trimmedUsername);
       setUsers([userData]);
     } catch (err) {
-      console.error("Error fetching user:", err.message);
+      console.error("Looks like we cant find the user");
       setUsers([]);
       setError(err.message);
     } finally {
@@ -32,13 +32,29 @@ const Search = () => {
   };
 
   return (
-    <div>
+    <form onSubmit={(e) => e.preventDefault()} style={{ padding: "20px" }}>
       <input
         type="text"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)} // <-- Track input
         placeholder="Search for a GitHub user..."
-        onChange={handleSearch}
         style={{ width: "100%", padding: "10px", fontSize: "16px" }}
       />
+
+      <button
+        type="button"
+        onClick={handleSearch} // <-- No need to pass event
+        style={{
+          padding: "10px 20px",
+          fontSize: "16px",
+          marginLeft: "10px",
+          cursor: "pointer",
+        }}
+      >
+        Search
+      </button>
+
+      <h2>Search Results:</h2>
 
       <ul id="search-results">
         {loading && <li>Loading...</li>}
@@ -60,7 +76,7 @@ const Search = () => {
             </li>
           ))}
       </ul>
-    </div>
+    </form>
   );
 };
 

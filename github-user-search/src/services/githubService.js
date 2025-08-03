@@ -1,15 +1,15 @@
 // services/githubService.js
 import axios from 'axios';
 
-const fetchUserData = async (username, location, minimumRepositories) => {
+const fetchUserData = async (username, location, minRepos) => {
   let query = username;
 
   if (location && location.trim()) {
     query += `+location:${location.trim()}`;
   }
 
-  if (minimumRepositories && minimumRepositories.trim()) {
-    query += `+repos:>=${minimumRepositories.trim()}`;
+  if (minRepos && minRepos.trim()) {
+    query += `+repos:>=${minRepos.trim()}`;
   }
 
 

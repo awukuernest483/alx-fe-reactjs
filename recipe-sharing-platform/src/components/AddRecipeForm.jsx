@@ -29,7 +29,6 @@ const AddRecipeForm = ({ onSubmit }) => {
       steps: steps.split("\n").map((s) => s.trim()),
     });
 
-    // reset
     setTitle("");
     setIngredients("");
     setSteps("");
@@ -41,7 +40,10 @@ const AddRecipeForm = ({ onSubmit }) => {
       onSubmit={handleSubmit}
       className="flex flex-col gap-4 max-w-md mx-auto p-4 bg-white shadow rounded-lg"
     >
+      <h2 className="text-xl font-bold mb-2">Add a New Recipe</h2>
+
       <div>
+        <label className="block mb-1 font-medium">Title</label>
         <input
           type="text"
           placeholder="Recipe title"
@@ -49,10 +51,13 @@ const AddRecipeForm = ({ onSubmit }) => {
           onChange={(e) => setTitle(e.target.value)}
           className="border p-2 rounded w-full"
         />
-        {errors.title && <p className="text-red-500 text-sm">{errors.title}</p>}
+        {errors.title && (
+          <p className="text-red-500 text-sm font-semibold">{errors.title}</p>
+        )}
       </div>
 
       <div>
+        <label className="block mb-1 font-medium">Ingredients</label>
         <textarea
           placeholder="Ingredients (comma separated)"
           value={ingredients}
@@ -60,11 +65,14 @@ const AddRecipeForm = ({ onSubmit }) => {
           className="border p-2 rounded w-full"
         />
         {errors.ingredients && (
-          <p className="text-red-500 text-sm">{errors.ingredients}</p>
+          <p className="text-red-500 text-sm font-semibold">
+            {errors.ingredients}
+          </p>
         )}
       </div>
 
       <div>
+        <label className="block mb-1 font-medium">Steps</label>
         <textarea
           placeholder="Steps (each step on new line)"
           value={steps}
@@ -72,13 +80,13 @@ const AddRecipeForm = ({ onSubmit }) => {
           className="border p-2 rounded w-full"
         />
         {errors.steps && (
-          <p className="text-red-500 text-sm">{errors.steps}</p>
+          <p className="text-red-500 text-sm font-semibold">{errors.steps}</p>
         )}
       </div>
 
       <button
         type="submit"
-        className="bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+        className="bg-blue-500 text-white py-2 rounded hover:bg-blue-600 font-bold"
       >
         Add Recipe
       </button>

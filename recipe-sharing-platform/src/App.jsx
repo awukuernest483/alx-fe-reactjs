@@ -6,9 +6,12 @@ import ReactDOM from "react-dom/client";
 function App() {
 
   return (
-    <>
-     <Homepage/>
-    </>
+   <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/recipe/:id" element={<RecipeDetail />} />
+      </Routes>
+    </Router>
   )
 }
 

@@ -18,7 +18,7 @@ const Homepage = () => {
         {recipes.map((recipe) => (
           <div
             key={recipe.id}
-            className="border rounded-xl shadow p-4 bg-white"
+            className="border rounded-xl shadow p-4 bg-white transition-transform transform hover:scale-105 hover:shadow-lg"
           >
             <h2 className="text-xl font-semibold mb-2">{recipe.title}</h2>
             {recipe.image && (

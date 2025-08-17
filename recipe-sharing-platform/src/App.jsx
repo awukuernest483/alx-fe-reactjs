@@ -1,5 +1,5 @@
 import './App.css'
-import Homepage from './components/HomePage'
+import HomePage from './components/Homepage';
 import React from "react";
 import ReactDOM from "react-dom/client";
 

@@ -1,12 +1,12 @@
 import './App.css'
 import HomePage from './components/Homepage';
+import RecipeDetail from './components/RecipeDetail'; // make sure this exists
 import React from "react";
-import ReactDOM from "react-dom/client";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
-
   return (
-   <Router>
+    <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/recipe/:id" element={<RecipeDetail />} />
@@ -15,4 +15,4 @@ function App() {
   )
 }
 
-export default App
+export default App;

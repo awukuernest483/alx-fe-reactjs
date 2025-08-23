@@ -1,3 +1,4 @@
+// src/App.jsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Profile from "./components/Profile";
@@ -10,13 +11,13 @@ function App() {
     <Router>
       <Routes>
         {/* Profile nested routes */}
-        <Route path="/profile" element={<Profile />}>
+        <Route path="/profile/*" element={<Profile />}>
           <Route path="details" element={<ProfileDetails />} />
           <Route path="settings" element={<ProfileSettings />} />
         </Route>
 
-        {/* Dynamic route for blog posts */}
-        <Route path="/blog/:postId" element={<BlogPost />} />
+        {/* ✅ Dynamic blog route */}
+        <Route path="/blog/:id" element={<BlogPost />} />
       </Routes>
     </Router>
   );

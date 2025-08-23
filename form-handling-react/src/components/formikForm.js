@@ -4,19 +4,16 @@ import * as Yup from 'yup';
 
 // Validation schema using Yup
 const validationSchema = Yup.object({
-  name: Yup.string()
-    .min(2, 'Name must be at least 2 characters')
-    .required('Name is required'),
-  email: Yup.string()
-    .email('Invalid email address')
-    .required('Email is required'),
+  name: Yup.string().required('Name is required')
+    .min(2, 'Name must be at least 2 characters'),
+  email: Yup.string().required('Email is required')
+    .email('Invalid email address'),
   age: Yup.number()
     .min(18, 'Must be at least 18 years old')
     .max(120, 'Age must be realistic')
     .required('Age is required'),
-  message: Yup.string()
+  message: Yup.string().required('Message is required')
     .min(10, 'Message must be at least 10 characters')
-    .required('Message is required')
 });
 
 // Initial form values

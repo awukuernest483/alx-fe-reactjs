@@ -1,3 +1,4 @@
+// src/TodoList.js - Enhanced with data-testid attributes
 import React, { useState } from "react";
 import AddTodoForm from "./AddTodoForm";
 
@@ -30,10 +31,10 @@ export default function TodoList() {
   };
 
   return (
-    <div>
+    <div data-testid="todo-list-container">
       <h1>Todo List</h1>
       <AddTodoForm onAddTodo={addTodo} />
-      <ul>
+      <ul data-testid="todo-list">
         {todos.map((todo) => (
           <li
             key={todo.id}
@@ -42,19 +43,24 @@ export default function TodoList() {
               textDecoration: todo.completed ? "line-through" : "none",
               cursor: "pointer",
             }}
+            data-testid={`todo-item-${todo.id}`}
           >
-            {todo.text}
+            <span data-testid={`todo-text-${todo.id}`}>{todo.text}</span>
             <button
               onClick={(e) => {
                 e.stopPropagation(); // prevent toggle when deleting
                 deleteTodo(todo.id);
               }}
+              data-testid={`delete-todo-${todo.id}`}
             >
               Delete
             </button>
           </li>
         ))}
       </ul>
+      {todos.length === 0 && (
+        <p data-testid="empty-message">No todos yet. Add one above!</p>
+      )}
     </div>
   );
 }

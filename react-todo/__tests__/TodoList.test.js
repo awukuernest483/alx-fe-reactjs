@@ -1,41 +1,41 @@
-/* eslint-env jest */
-import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import TodoList from "../src/components/TodoList";
+import "@testing-library/jest-dom";
+import TodoList from "../TodoList";
 
 describe("TodoList Component", () => {
   test("renders initial todos", () => {
     render(<TodoList />);
-    expect(screen.getByText(/Learn React/i)).toBeInTheDocument();
-    expect(screen.getByText(/Build a Todo App/i)).toBeInTheDocument();
+    expect(screen.getByText("Learn React")).toBeInTheDocument();
+    expect(screen.getByText("Build a Todo App")).toBeInTheDocument();
   });
 
-  test("adds a new todo", () => {
+  test("can add a new todo", () => {
     render(<TodoList />);
-    const input = screen.getByPlaceholderText(/add new todo/i);
-    const button = screen.getByText(/add/i);
+    const input = screen.getByPlaceholderText("Add a new todo");
+    const button = screen.getByText("Add");
 
     fireEvent.change(input, { target: { value: "New Todo" } });
     fireEvent.click(button);
 
-    expect(screen.getByText(/New Todo/i)).toBeInTheDocument();
+    expect(screen.getByText("New Todo")).toBeInTheDocument();
   });
 
-  test("toggles a todo", () => {
+  test("can toggle a todo", () => {
     render(<TodoList />);
-    const todoItem = screen.getByText(/Learn React/i);
+    const todoItem = screen.getByText("Learn React");
 
     fireEvent.click(todoItem);
 
-    expect(todoItem).toHaveClass("completed"); // depends on your class setup
+    expect(todoItem).toHaveStyle("text-decoration: line-through");
   });
 
-  test("deletes a todo", () => {
+  test("can delete a todo", () => {
     render(<TodoList />);
-    const deleteButton = screen.getAllByText(/delete/i)[0];
+    const todoItem = screen.getByText("Learn React");
+    const deleteButton = screen.getAllByText("Delete")[0];
 
     fireEvent.click(deleteButton);
 
-    expect(screen.queryByText(/Learn React/i)).not.toBeInTheDocument();
+    expect(todoItem).not.toBeInTheDocument();
   });
 });

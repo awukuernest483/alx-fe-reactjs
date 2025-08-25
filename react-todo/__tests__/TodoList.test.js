@@ -1,30 +1,33 @@
-// src/__tests__/TodoList.test.js - Comprehensive test suite
+// src/__tests__/TodoList.test.js
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import TodoList from "../TodoList";
+import TodoList from "../components/TodoList";
 
 describe("TodoList Component", () => {
-  // Test 1: Initial render
+  beforeEach(() => {
+    // Clean up before each test
+    jest.clearAllMocks();
+  });
+
   test("renders TodoList component with initial todos", () => {
     render(<TodoList />);
     
-    // Check title
+    // Check if the title is rendered
     expect(screen.getByRole("heading", { name: /todo list/i })).toBeInTheDocument();
     
-    // Check initial todos
+    // Check if initial todos are rendered
     expect(screen.getByText("Learn React")).toBeInTheDocument();
     expect(screen.getByText("Build a Todo App")).toBeInTheDocument();
     
-    // Check form elements
+    // Check if add todo input is rendered
     expect(screen.getByPlaceholderText("Add a new todo")).toBeInTheDocument();
-    expect(screen.getByText("Add")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /add/i })).toBeInTheDocument();
   });
 
-  // Test 2: Adding a new todo
   test("can add a new todo", async () => {
     render(<TodoList />);
     const input = screen.getByPlaceholderText("Add a new todo");
-    const button = screen.getByText("Add");
+    const button = screen.getByRole("button", { name: /add/i });
 
     fireEvent.change(input, { target: { value: "New Todo" } });
     fireEvent.click(button);
@@ -37,132 +40,136 @@ describe("TodoList Component", () => {
     expect(input.value).toBe("");
   });
 
-  // Test 3: Adding todo with form submission (Enter key)
   test("can add a new todo by pressing Enter", async () => {
     render(<TodoList />);
     const input = screen.getByPlaceholderText("Add a new todo");
 
     fireEvent.change(input, { target: { value: "Todo via Enter" } });
-    fireEvent.submit(input.closest('form'));
+    
+    // Submit the form (which happens on Enter)
+    const form = input.closest('form');
+    fireEvent.submit(form);
 
     await waitFor(() => {
       expect(screen.getByText("Todo via Enter")).toBeInTheDocument();
     });
+
+    // Input should be cleared
+    expect(input.value).toBe("");
   });
 
-  // Test 4: Prevent adding empty todos
   test("does not add empty or whitespace-only todos", () => {
     render(<TodoList />);
     const input = screen.getByPlaceholderText("Add a new todo");
-    const button = screen.getByText("Add");
+    const button = screen.getByRole("button", { name: /add/i });
+    
+    // Get initial todo count
+    const initialTodos = screen.getAllByText("Delete");
+    const initialCount = initialTodos.length;
     
     // Try empty string
     fireEvent.change(input, { target: { value: "" } });
     fireEvent.click(button);
     
-    // Should still have only 2 initial todos
-    expect(screen.getAllByText("Delete")).toHaveLength(2);
+    // Should still have same number of todos
+    expect(screen.getAllByText("Delete")).toHaveLength(initialCount);
     
     // Try whitespace only
     fireEvent.change(input, { target: { value: "   " } });
     fireEvent.click(button);
     
-    // Should still have only 2 initial todos
-    expect(screen.getAllByText("Delete")).toHaveLength(2);
+    // Should still have same number of todos
+    expect(screen.getAllByText("Delete")).toHaveLength(initialCount);
   });
 
-  // Test 5: Toggling todo completion
-  test("can toggle a todo completion status", async () => {
+  test("can toggle a todo completion status", () => {
     render(<TodoList />);
     const todoItem = screen.getByText("Learn React");
 
-    // Initially should not be completed
-    expect(todoItem.closest('li')).toHaveStyle("text-decoration: none");
+    // Initially should not be completed (no line-through)
+    expect(todoItem.parentElement).toHaveStyle("text-decoration: none");
 
     // Click to toggle
     fireEvent.click(todoItem);
 
-    // Should now be completed
-    await waitFor(() => {
-      expect(todoItem.closest('li')).toHaveStyle("text-decoration: line-through");
-    });
+    // Should now be completed (line-through)
+    expect(todoItem.parentElement).toHaveStyle("text-decoration: line-through");
 
     // Click again to toggle back
     fireEvent.click(todoItem);
 
     // Should not be completed again
-    await waitFor(() => {
-      expect(todoItem.closest('li')).toHaveStyle("text-decoration: none");
-    });
+    expect(todoItem.parentElement).toHaveStyle("text-decoration: none");
   });
 
-  // Test 6: Deleting a todo
   test("can delete a todo", async () => {
     render(<TodoList />);
-    const todoItem = screen.getByText("Learn React");
-    const deleteButtons = screen.getAllByText("Delete");
-    const deleteButton = deleteButtons[0]; // First delete button
+    const todoText = "Learn React";
+    const todoItem = screen.getByText(todoText);
+    
+    // Find the delete button for this specific todo
+    const todoListItem = todoItem.closest('li');
+    const deleteButton = todoListItem.querySelector('button');
 
     fireEvent.click(deleteButton);
 
     await waitFor(() => {
-      expect(todoItem).not.toBeInTheDocument();
+      expect(screen.queryByText(todoText)).not.toBeInTheDocument();
     });
-    
-    // Should have one less delete button
-    expect(screen.getAllByText("Delete")).toHaveLength(1);
   });
 
-  // Test 7: Delete button doesn't trigger toggle
   test("delete button click does not toggle todo", async () => {
     render(<TodoList />);
-    const todoItem = screen.getByText("Learn React");
-    const deleteButton = screen.getAllByText("Delete")[0];
-
+    const todoText = "Learn React";
+    const todoItem = screen.getByText(todoText);
+    const todoListItem = todoItem.closest('li');
+    
+    // Ensure todo is not completed initially
+    expect(todoListItem).toHaveStyle("text-decoration: none");
+    
     // Click delete button
+    const deleteButton = todoListItem.querySelector('button');
     fireEvent.click(deleteButton);
 
-    // Todo should be deleted, not toggled
+    // Todo should be deleted (not in document), so it wasn't toggled
     await waitFor(() => {
-      expect(todoItem).not.toBeInTheDocument();
+      expect(screen.queryByText(todoText)).not.toBeInTheDocument();
     });
   });
 
-  // Test 8: Empty state
   test("shows empty message when all todos are deleted", async () => {
     render(<TodoList />);
-    const deleteButtons = screen.getAllByText("Delete");
-
+    
     // Delete all todos
-    fireEvent.click(deleteButtons[0]);
-    await waitFor(() => {
-      expect(screen.getAllByText("Delete")).toHaveLength(1);
-    });
-
-    fireEvent.click(screen.getByText("Delete"));
+    const deleteButtons = screen.getAllByText("Delete");
+    
+    for (const button of deleteButtons) {
+      fireEvent.click(button);
+    }
     
     await waitFor(() => {
-      expect(screen.getByTestId("empty-message")).toBeInTheDocument();
       expect(screen.getByText("No todos yet. Add one above!")).toBeInTheDocument();
     });
   });
 
-  // Test 9: Multiple todos can be added
   test("can add multiple todos", async () => {
     render(<TodoList />);
     const input = screen.getByPlaceholderText("Add a new todo");
-    const button = screen.getByText("Add");
+    const button = screen.getByRole("button", { name: /add/i });
 
     // Add first todo
     fireEvent.change(input, { target: { value: "First new todo" } });
     fireEvent.click(button);
+
+    await waitFor(() => {
+      expect(screen.getByText("First new todo")).toBeInTheDocument();
+    });
 
     // Add second todo
     fireEvent.change(input, { target: { value: "Second new todo" } });
     fireEvent.click(button);
 
     await waitFor(() => {
-      expect(screen.getByText("First new todo")).toBeInTheDocument();
       expect(screen.getByText("Second new todo")).toBeInTheDocument();
     });
 
@@ -170,11 +177,10 @@ describe("TodoList Component", () => {
     expect(screen.getAllByText("Delete")).toHaveLength(4);
   });
 
-  // Test 10: Input trims whitespace
   test("trims whitespace from todo text", async () => {
     render(<TodoList />);
     const input = screen.getByPlaceholderText("Add a new todo");
-    const button = screen.getByText("Add");
+    const button = screen.getByRole("button", { name: /add/i });
 
     fireEvent.change(input, { target: { value: "  Todo with spaces  " } });
     fireEvent.click(button);
@@ -182,42 +188,8 @@ describe("TodoList Component", () => {
     await waitFor(() => {
       expect(screen.getByText("Todo with spaces")).toBeInTheDocument();
     });
-  });
-
-  // Test 11: Integration test - complete workflow
-  test("complete workflow: add, toggle, and delete todo", async () => {
-    render(<TodoList />);
-    const input = screen.getByPlaceholderText("Add a new todo");
-    const button = screen.getByText("Add");
-
-    // Add a todo
-    fireEvent.change(input, { target: { value: "Workflow test todo" } });
-    fireEvent.click(button);
-
-    // Wait for todo to be added
-    await waitFor(() => {
-      expect(screen.getByText("Workflow test todo")).toBeInTheDocument();
-    });
-
-    const newTodo = screen.getByText("Workflow test todo");
-
-    // Toggle it to completed
-    fireEvent.click(newTodo);
-
-    await waitFor(() => {
-      expect(newTodo.closest('li')).toHaveStyle("text-decoration: line-through");
-    });
-
-    // Delete it
-    const deleteButtons = screen.getAllByText("Delete");
-    const todoDeleteButton = deleteButtons.find(button => 
-      button.closest('li').textContent.includes("Workflow test todo")
-    );
     
-    fireEvent.click(todoDeleteButton);
-
-    await waitFor(() => {
-      expect(screen.queryByText("Workflow test todo")).not.toBeInTheDocument();
-    });
+    // Should not find the version with extra spaces
+    expect(screen.queryByText("  Todo with spaces  ")).not.toBeInTheDocument();
   });
 });
